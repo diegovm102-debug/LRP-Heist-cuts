@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Heist Profit Splitter</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+  }
+  .container {
+    max-width: 500px;
+    margin: auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+  }
+  input[type="number"], input[type="range"] {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
+  }
+  input[type="range"] {
+    margin-top: 10px;
+  }
+  .slider-label {
+    display: flex;
+    justify-content: space-between;
+  }
+  button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #0056b3;
+  }
+  .result {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #e9ecef;
+    border-radius: 8px;
+  }
+  .error {
+    color: red;
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Heist Profit Splitter</h1>
+  <label for="totalAmount">Total Heist Amount:</label>
+  <input type="number" id="totalAmount" placeholder="Enter total amount" min="0" />
+
+  <label for="participants">Number of Participants:</label>
+  <input type="number" id="participants" placeholder="Enter number of people" min="1" />
+
+  <label for="supplierPercent">Supplier Percent (0-100):</label>
+  <input type="range" id="supplierPercent" min="0" max="100" value="20" />
+  <div class="slider-label">
+    <span>0%</span>
+    <span id="percentValue">20%</span>
+    <span>100%</span>
+  </div>
+
+  <button id="calculateBtn">Calculate</button>
+
+  <div class="error" id="errorMsg"></div>
+
+  <div class="result" id="resultArea" style="display:none;">
+    <h2>Results</h2>
+    <p>Supplier's Share: <span id="supplierShare"></span></p>
+    <p>Total Remaining for Participants: <span id="remainingAmount"></span></p>
+    <p>Each Participant Gets: <span id="perPersonAmount"></span></p>
+  </div>
+</div>
+
+<script>
+  const supplierSlider = document.getElementById('supplierPercent');
+  const percentValue = document.getElementById('percentValue');
+  const calculateBtn = document.getElementById('calculateBtn');
+  const errorMsg = document.getElementById('errorMsg');
+
+  supplierSlider.oninput = function() {
+    percentValue.innerText = this.value + '%';
+  }
+
+  document.getElementById('calculateBtn').addEventListener('click', () => {
+    // Get input values
+    const totalAmount = parseFloat(document.getElementById('totalAmount').value);
+    const participants = parseInt(document.getElementById('participants').value);
+    const supplierPercent = parseFloat(document.getElementById('supplierPercent').value);
+
+    // Validate inputs
+    if (isNaN(totalAmount) || totalAmount <= 0) {
+      errorMsg.innerText = 'Please enter a valid total amount.';
+      document.getElementById('resultArea').style.display = 'none';
+      return;
+    }
+    if (isNaN(participants) || participants <= 0) {
+      errorMsg.innerText = 'Please enter a valid number of participants.';
+      document.getElementById('resultArea').style.display = 'none';
+      return;
+    }
+    if (supplierPercent < 0 || supplierPercent > 100) {
+      errorMsg.innerText = 'Supplier percent must be between 0 and 100.';
+      document.getElementById('resultArea').style.display = 'none';
+      return;
+    }
+
+    // Clear error message
+    errorMsg.innerText = '';
+
+    // Calculate shares
+    const supplierShare = (totalAmount * supplierPercent) / 100;
+    const remaining = totalAmount - supplierShare;
+    const perPerson = remaining / participants;
+
+    // Display results
+    document.getElementById('supplierShare').innerText = `$${supplierShare.toFixed(2)}`;
+    document.getElementById('remainingAmount').innerText = `$${remaining.toFixed(2)}`;
+    document.getElementById('perPersonAmount').innerText = `$${perPerson.toFixed(2)}`;
+
+    document.getElementById('resultArea').style.display = 'block';
+  });
+</script>
+
+</body>
+</html>
